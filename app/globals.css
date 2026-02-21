@@ -1,26 +1,92 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* 
+ * Theme Configuration
+ * Minimalist Luxury: Ivory, Gold, Charcoal
+ */
+
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --font-serif: var(--font-cormorant);
+  --font-sans: var(--font-jost);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  /* Core Colors */
+  --background: oklch(0.98 0.01 80); /* Soft Ivory */
+  --foreground: oklch(0.2 0.02 20);  /* Deep Charcoal */
+  
+  --primary: oklch(0.7 0.08 85);    /* Champagne Gold */
+  --primary-foreground: oklch(0.98 0.01 80);
+  
+  --secondary: oklch(0.9 0.02 85);  /* Light Champagne */
+  --secondary-foreground: oklch(0.2 0.02 20);
+  
+  --accent: oklch(0.65 0.1 85);     /* Bright Gold */
+  --accent-foreground: oklch(0.2 0.02 20);
+  
+  --muted: oklch(0.92 0.01 80);
+  --muted-foreground: oklch(0.4 0.02 20);
+  
+  --border: oklch(0.85 0.05 85 / 0.3);
+  --input: oklch(0.85 0.05 85 / 0.3);
+  --ring: oklch(0.7 0.08 85);
+  
+  --radius: 0.5rem;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+  
+  h1, h2, h3, h4, .font-serif {
+    @apply font-serif;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+  .text-luxury-gold {
+    background: linear-gradient(135deg, oklch(0.8 0.1 85) 0%, oklch(0.6 0.1 85) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  .luxury-border {
+    border: 1px solid oklch(0.7 0.08 85 / 0.3);
+  }
+  
+  .glass-card {
+    @apply bg-background/40 backdrop-blur-md border border-white/20 shadow-sm;
+  }
 }
