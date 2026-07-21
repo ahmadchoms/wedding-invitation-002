@@ -75,7 +75,7 @@ export default function Gallery() {
 
 /**
  * Lightbox Component
- * Full-screen image preview with smooth transitions.
+ * Popup modal preview (non-fullscreen).
  */
 function Lightbox({ image, onClose }) {
   return (
@@ -83,37 +83,44 @@ function Lightbox({ image, onClose }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-200 bg-background/95 backdrop-blur-xl flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 md:p-6"
       onClick={onClose}
     >
-      <button
-        onClick={onClose}
-        className="absolute top-8 right-8 text-background/60 hover:text-background transition-colors p-2"
-      >
-        <X size={32} strokeWidth={1} />
-      </button>
-
       <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.9, opacity: 0 }}
+        initial={{ scale: 0.9, opacity: 0, y: 10 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.9, opacity: 0, y: 10 }}
         transition={{ type: "spring", damping: 25, stiffness: 200 }}
-        className="relative w-full max-w-5xl h-full flex flex-col items-center justify-center"
+        className="relative w-1/4 bg-background rounded-2xl p-4 md:p-6 shadow-2xl border border-border/10 overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="relative w-full h-[80vh]">
+        {/* Tombol Close */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 z-10 p-2 rounded-full bg-background/80 hover:bg-muted text-foreground transition-colors"
+          aria-label="Close modal"
+        >
+          <X size={20} />
+        </button>
+
+        {/* Container Gambar Modal */}
+        <div className="relative w-full aspect-4/5 rounded-lg overflow-hidden bg-muted">
           <Image
             src={image.src}
             alt={image.alt}
             fill
-            className="object-contain"
-            sizes="90vw"
+            className="object-cover"
+            sizes="(max-width: 768px) 90vw, 600px"
             priority
           />
         </div>
-        <p className="mt-8 font-serif italic text-background/60 text-lg">
-          {image.alt}
-        </p>
+
+        {/* Keterangan Gambar */}
+        {image.alt && (
+          <p className="mt-4 font-serif italic text-foreground/70 text-center text-sm md:text-base">
+            {image.alt}
+          </p>
+        )}
       </motion.div>
     </motion.div>
   );

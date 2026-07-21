@@ -63,8 +63,8 @@ export default function Closing() {
             transition={{ duration: 1, delay: 0.8 }}
             className="mt-20 pt-10 border-t border-primary/10"
           >
-            <p className="font-sans text-[10px] tracking-[0.2em] uppercase text-primary/40">
-              14 Juni 2025 &bull; Jakarta &bull; Indonesia
+            <p className="font-bold text-[10px] tracking-[0.2em] uppercase text-foreground/40">
+              Dibuat dengan penuh kasih oleh Chozy.ID
             </p>
           </motion.div>
         </motion.div>
