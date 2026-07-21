@@ -15,10 +15,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+// Import supabase client (sesuaikan path impor sesuai struktur project-mu)
+import { supabase } from "@/lib/supabaseClient";
+
 /**
- * RSVP Section
- * Handles guest attendance confirmation with a premium, user-friendly form.
+ * Toggle `isDemo` ke false saat siap terhubung ke Supabase secara live.
  */
+const isDemo = true;
+
 export default function RSVP() {
   const [form, setForm] = useState({
     name: "",
@@ -34,13 +38,57 @@ export default function RSVP() {
 
     setStatus("loading");
 
-    // Simulate API call
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      setStatus("success");
-      setForm({ name: "", attendance: "", guestCount: "1", message: "" });
-    } catch (error) {
-      setStatus("error");
+    if (isDemo) {
+      // 🎭 MODE DEMO: Simulasi request
+      try {
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+        setStatus("success");
+        setForm({ name: "", attendance: "", guestCount: "1", message: "" });
+      } catch (error) {
+        setStatus("error");
+      }
+    } else {      
+      try {
+        const promises = [];
+
+        // 1. Simpan Konfirmasi Kehadiran ke tabel `rsvps`
+        promises.push(
+          supabase.from("rsvps").insert([
+            {
+              name: form.name,
+              attendance: form.attendance,
+              guest_count: form.attendance === "Hadir" ? parseInt(form.guestCount) : 0,
+            },
+          ])
+        );
+
+        // 2. Jika user mengisi ucapan/doa, simpan ke tabel `greetings`
+        if (form.message.trim() !== "") {
+          promises.push(
+            supabase.from("greetings").insert([
+              {
+                name: form.name,
+                message: form.message,
+              },
+            ])
+          );
+        }
+
+        const results = await Promise.all(promises);
+
+        // Periksa jika ada error pada salah satu query
+        const hasError = results.some((res) => res.error);
+        if (hasError) {
+          const firstErr = results.find((res) => res.error);
+          throw firstErr.error;
+        }
+
+        setStatus("success");
+        setForm({ name: "", attendance: "", guestCount: "1", message: "" });
+      } catch (error) {
+        console.error("Supabase insert error:", error);
+        setStatus("error");
+      }
     }
   };
 
@@ -55,7 +103,7 @@ export default function RSVP() {
           className="text-center mb-16"
         >
           <span className="font-sans text-xs tracking-[0.3em] text-primary uppercase mb-4 block">
-            Reservation
+            Reservation {isDemo && "(Demo Mode)"}
           </span>
           <h2 className="font-serif text-4xl md:text-5xl font-light mb-6">
             Konfirmasi Kehadiran
@@ -112,10 +160,11 @@ export default function RSVP() {
                         key={option}
                         type="button"
                         onClick={() => setForm({ ...form, attendance: option })}
-                        className={`py-3 px-6 text-xs uppercase tracking-widest border transition-all duration-300 ${form.attendance === option
+                        className={`py-3 px-6 text-xs uppercase tracking-widest border transition-all duration-300 ${
+                          form.attendance === option
                             ? "bg-primary border-primary text-background"
                             : "border-primary/20 text-primary hover:border-primary/50"
-                          }`}
+                        }`}
                       >
                         {option}
                       </button>
@@ -174,7 +223,14 @@ export default function RSVP() {
                   disabled={status === "loading"}
                   className="w-full h-14 bg-primary text-background hover:bg-primary/90 transition-all duration-300 text-xs tracking-[0.3em] uppercase group"
                 >
-                  <Send className={`mr-2 transition-transform duration-300 ${status === "loading" ? "animate-pulse" : "group-hover:translate-x-1 group-hover:-translate-y-1"}`} size={16} />
+                  <Send
+                    className={`mr-2 transition-transform duration-300 ${
+                      status === "loading"
+                        ? "animate-pulse"
+                        : "group-hover:translate-x-1 group-hover:-translate-y-1"
+                    }`}
+                    size={16}
+                  />
                   {status === "loading" ? "Mengirim..." : "Kirim Konfirmasi"}
                 </Button>
 
@@ -193,10 +249,6 @@ export default function RSVP() {
   );
 }
 
-/**
- * SuccessState Component
- * Shown after form submission.
- */
 function SuccessState({ onReset }) {
   return (
     <motion.div
